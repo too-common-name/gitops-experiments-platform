@@ -5,3 +5,4 @@ resources:
   - quota.yaml
   - default-network.yaml
   - limit.yaml
+  - rolebindings.yaml
