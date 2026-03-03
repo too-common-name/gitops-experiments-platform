@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: orders-project
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io  
+spec:
+  description: "Project for the Orders team (Helm)"
+  
+  # 1. Where can I pull the code from?
+  sourceRepos:
+  - 'https://github.com/too-common-name/gitops-experiments-orders'
+
+  # 2. Where can I deploy?
+  destinations:
+  - namespace: ecommerce-qa
+    server: https://kubernetes.default.svc
+  - namespace: ecommerce-staging
+    server: https://kubernetes.default.svc
+  - namespace: ecommerce-prod
+    server: https://kubernetes.default.svc
+
+  # 3. RBAC: Who can do what?
+  roles:
+  - name: team-orders-deployer
+    description: "Sync permissions for the Orders team"
+    policies:
+    # p = policy, subject, reource, action, target, effect
+    - p, proj:orders-project:team-orders-deployer, applications, get, orders-project/*, allow
+    - p, proj:orders-project:team-orders-deployer, applications, sync, orders-project/*, allow
+    groups:
+    - ocp_team_orders # Mapped to the OpenShift/SSO group

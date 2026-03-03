@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: platform-tenants-appset
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  generators:
+  - git:
+      repoURL: 'https://github.com/too-common-name/gitops-experiments-platform'
+      revision: HEAD
+      directories:
+      - path: 'platform/tenants/overlays/*' 
+  template:
+    metadata:
+      name: 'tenant-{{path.basename}}'
+    spec:
+      project: default
+      source:
+        repoURL: 'https://github.com/too-common-name/gitops-experiments-platform'
+        targetRevision: HEAD
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
