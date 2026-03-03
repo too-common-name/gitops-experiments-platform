@@ -16,7 +16,7 @@ spec:
     metadata:
       name: 'tenant-{{path.basename}}'
     spec:
-      project: default
+      project: ecommerce-platform-project
       source:
         repoURL: 'https://github.com/too-common-name/gitops-experiments-platform'
         targetRevision: HEAD
