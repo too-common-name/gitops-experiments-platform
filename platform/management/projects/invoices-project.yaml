@@ -18,7 +18,7 @@ spec:
   destinations:
   - namespace: ecommerce-qa
     server: https://kubernetes.default.svc
-  - namespace: ecommerce-staging
+  - namespace: ecommerce-stage
     server: https://kubernetes.default.svc
   - namespace: ecommerce-prod
     server: https://kubernetes.default.svc
