@@ -8,7 +8,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io  
 spec:
-  description: "Project for the Orders team (Helm)"
+  description: "Project for the Invoice team (Kustomize)"
   
   # 1. Where can I pull the code from?
   sourceRepos:
