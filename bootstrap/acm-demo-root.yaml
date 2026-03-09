@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: pr-demo-root
+  name: acm-demo-root
   namespace: openshift-gitops
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://github.com/too-common-name/gitops-experiments-platform.git'
     targetRevision: HEAD
-    path: platform/pr-demo
+    path: platform/acm-demo
     directory:
       recurse: true
   destination:

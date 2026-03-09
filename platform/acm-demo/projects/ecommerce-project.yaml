@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: ecommerce-platform-project
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io  
+spec:
+  description: "Internal project for Platform Administration"
+  
+  sourceRepos:
+  - 'https://github.com/too-common-name/gitops-experiments-platform'
+
+  destinations:
+  - namespace: 'openshift-gitops'
+    server: '*'
+  - namespace: 'ecommerce-*'
+    server: '*'
+
+  clusterResourceWhitelist:
+  - group: ''
+    kind: Namespace
+
+  roles:
+  - name: platform-admin
+    description: "Full access to platform resources"
+    policies:
+    - p, proj:ecommerce-platform-project:platform-admin, applications, *, ecommerce-platform-project/*, allow
+    groups:
+    - cluster-admins  
