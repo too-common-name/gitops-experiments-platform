@@ -3,6 +3,10 @@ kind: AppProject
 metadata:
   name: orders-pr-project
   namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io  
 spec:
   description: "Project for PR demo"
   sourceRepos:
