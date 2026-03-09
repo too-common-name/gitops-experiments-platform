@@ -12,8 +12,8 @@ spec:
           owner: too-common-name
           repo: gitops-experiments-orders
         requeueAfterSeconds: 20
-      filters:
-      - branchMatch: ".*-argocd"
+        filters:
+        - branchMatch: ".*-argocd"
   template:
     metadata:
       name: 'orders-pr-{{number}}'
