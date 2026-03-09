@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: orders-pr-demo
+  namespace: openshift-gitops
+spec:
+  generators:
+    - pullRequest:
+        github:
+          owner: too-common-name
+          repo: gitops-experiments-orders
+        requeueAfterSeconds: 20
+  template:
+    metadata:
+      name: 'orders-pr-{{number}}'
+    spec:
+      project: orders-pr-project 
+      source:
+        repoURL: 'https://github.com/too-common-name/gitops-experiments-orders.git'
+        targetRevision: '{{head_sha}}'
+        path: apps/orders
+        helm:
+          valueFiles:
+            - values-qa.yaml
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: 'ecommerce-pr-{{number}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
