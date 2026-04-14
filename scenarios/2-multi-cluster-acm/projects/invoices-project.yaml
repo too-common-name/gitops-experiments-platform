@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: invoices-project
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io  
+spec:
+  description: "Project for the Invoice team (Kustomize)"
+  
+  sourceRepos:
+  - 'https://github.com/too-common-name/gitops-experiments-invoices'
+
+  destinations:
+  - namespace: ecommerce-qa
+    server: '*'
+  - namespace: ecommerce-stage
+    server: '*'
+  - namespace: ecommerce-prod
+    server: '*'
+
+  roles:
+  - name: team-invoices-deployer
+    description: "Sync permissions for the Invoices team"
+    policies:
+    - p, proj:invoices-project:team-invoices-deployer, applications, get, invoices-project/*, allow
+    - p, proj:invoices-project:team-invoices-deployer, applications, sync, invoices-project/*, allow
+    groups:
+    - ocp_team_invoices

@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+namespace: ecommerce-prod
+
+commonLabels:
+  environment: production
+  tenant: ecommerce
+
+patches:
+  - path: patch-quota.yaml
+  - path: patch-limit-range.yaml

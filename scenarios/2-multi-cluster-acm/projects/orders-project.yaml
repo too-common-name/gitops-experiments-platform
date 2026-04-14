@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: orders-project
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io  
+spec:
+  description: "Project for the Orders team (Helm)"
+  
+  sourceRepos:
+  - 'https://github.com/too-common-name/gitops-experiments-orders'
+
+  destinations:
+  - namespace: ecommerce-qa
+    server: '*'
+  - namespace: ecommerce-stage
+    server: '*'
+  - namespace: ecommerce-prod
+    server: '*'
+
+  roles:
+  - name: team-orders-deployer
+    description: "Sync permissions for the Orders team"
+    policies:
+    - p, proj:orders-project:team-orders-deployer, applications, get, orders-project/*, allow
+    - p, proj:orders-project:team-orders-deployer, applications, sync, orders-project/*, allow
+    groups:
+    - ocp_team_orders

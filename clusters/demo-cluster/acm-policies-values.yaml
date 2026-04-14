@@ -1,0 +1,6 @@
+pipelines:
+  channel: "latest"
+
+ansible:
+  namespace: "aap"
+  channel: "stable-2.6"

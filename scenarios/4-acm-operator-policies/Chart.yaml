@@ -1,0 +1,5 @@
+apiVersion: v2
+name: acm-operator-policies
+description: ACM Policies to install Operators on managed clusters based on labels
+type: application
+version: 1.0.0

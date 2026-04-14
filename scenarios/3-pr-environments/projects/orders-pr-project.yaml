@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: orders-pr-project
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io  
+spec:
+  description: "Project for PR demo"
+  sourceRepos:
+    - 'https://github.com/too-common-name/gitops-experiments-orders.git'
+  destinations:
+    - namespace: 'orders-pr-*'
+      server: 'https://kubernetes.default.svc'
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace

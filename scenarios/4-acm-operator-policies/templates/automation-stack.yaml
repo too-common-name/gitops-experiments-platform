@@ -1,0 +1,86 @@
+# ---
+# PART 0: ManagedClusterSetBinding (required for Placements to resolve in this namespace)
+# ---
+apiVersion: cluster.open-cluster-management.io/v1beta2
+kind: ManagedClusterSetBinding
+metadata:
+  name: default
+  namespace: acm-policies
+spec:
+  clusterSet: default
+---
+# ---
+# PART 1: Placement & Binding
+# ---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Placement
+metadata:
+  name: automation-placement
+  namespace: acm-policies
+spec:
+  predicates:
+    - requiredClusterSelector:
+        labelSelector:
+          matchLabels:
+            automation: "enabled"
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: automation-binding
+  namespace: acm-policies
+placementRef:
+  name: automation-placement
+  kind: Placement
+  apiGroup: cluster.open-cluster-management.io
+subjects:
+  - name: policy-automation-operators
+    kind: Policy
+    apiGroup: policy.open-cluster-management.io
+---
+# ======================================================================
+# PART 2: Operator Installation (Using OperatorPolicy)
+# ======================================================================
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: policy-automation-operators
+  namespace: acm-policies
+spec:
+  remediationAction: enforce
+  disabled: false
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1beta1
+        kind: OperatorPolicy
+        metadata:
+          name: pipelines-operator-policy
+        spec:
+          severity: low
+          remediationAction: enforce
+          complianceType: musthave
+          upgradeApproval: Automatic
+          subscription:
+            channel: {{ .Values.pipelines.channel | default "latest" }}
+            name: openshift-pipelines-operator-rh
+            source: redhat-operators
+            sourceNamespace: openshift-marketplace
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1beta1
+        kind: OperatorPolicy
+        metadata:
+          name: aap-operator-policy
+        spec:
+          severity: low
+          remediationAction: enforce
+          complianceType: musthave
+          upgradeApproval: Automatic
+          operatorGroup:
+            name: ansible-automation-platform-group
+            targetNamespaces:
+              - {{ .Values.ansible.namespace | default "aap" }}
+          subscription:
+            channel: {{ .Values.ansible.channel | default "stable-2.6" }}
+            name: ansible-automation-platform-operator
+            source: redhat-operators
+            sourceNamespace: openshift-marketplace

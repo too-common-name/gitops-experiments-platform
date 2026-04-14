@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: acm-operator-policies-root
+  namespace: openshift-gitops
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/too-common-name/gitops-experiments-platform.git'
+    targetRevision: HEAD
+    path: scenarios/4-acm-operator-policies
+    helm:
+      valueFiles:
+        - ../../clusters/demo-cluster/acm-policies-values.yaml
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: acm-policies
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
