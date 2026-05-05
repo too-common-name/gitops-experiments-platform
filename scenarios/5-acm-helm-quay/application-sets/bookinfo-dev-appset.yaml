@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: bookinfo-dev
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  generators:
+    - clusterDecisionResource:
+        configMapRef: acm-placement
+        labelSelector:
+          matchLabels:
+            cluster.open-cluster-management.io/placement: dev-placement
+        requeueAfterSeconds: 180
+  template:
+    metadata:
+      name: 'bookinfo-dev-{{name}}'
+    spec:
+      project: bookinfo-project
+      source:
+        repoURL: 'quay.io/rh-ee-drossi'
+        chart: bookinfo
+        targetRevision: '0.1.0'
+        helm:
+          valuesObject:
+            productpage:
+              replicas: 1
+            details:
+              replicas: 1
+            reviews:
+              v1:
+                replicas: 1
+              v2:
+                enabled: false
+              v3:
+                enabled: false
+            ratings:
+              replicas: 1
+      destination:
+        server: '{{server}}'
+        namespace: bookinfo
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

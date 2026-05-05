@@ -6,7 +6,7 @@ Each scenario is self-contained under `scenarios/` and has a matching bootstrap 
 
 ## Prerequisites
 
-All scenarios require **OpenShift GitOps** (Argo CD) installed on the cluster. Scenarios 2 and 4 also require **Advanced Cluster Management** on the hub.
+All scenarios require **OpenShift GitOps** (Argo CD) installed on the cluster. Scenarios 2, 4 and 5 also require **Advanced Cluster Management** on the hub.
 
 The Argo CD controller needs cluster-admin to manage ACM resources (policies, placements) across namespaces:
 
@@ -46,6 +46,8 @@ oc apply -f bootstrap/1-single-cluster.yaml
 
 Same workloads but spread across clusters managed by ACM. Uses ACM Placements and the `clusterDecisionResource` generator so that Argo CD automatically targets clusters labeled `environment=nonprod` or `environment=prod`.
 
+Each microservice has its own Git repo, AppProject and ApplicationSet pair, reflecting a setup where independent teams own their service lifecycle and need isolated RBAC and release cycles.
+
 The scenario includes the integration resources that wire ACM and Argo CD together (GitOpsCluster, ManagedClusterSetBinding, Placement).
 
 ```bash
@@ -70,6 +72,20 @@ Per-cluster values live in `clusters/<name>/acm-policies-values.yaml`.
 oc apply -f bootstrap/4-acm-operator-policies.yaml
 ```
 
+### 5 — ACM + Helm from Quay (OCI)
+
+Deploys the Istio Bookinfo application across managed clusters using a Helm chart pulled from a Quay OCI registry. Same structure as scenario 2 (Placements, AppProject, ApplicationSets with `clusterDecisionResource`) but the ApplicationSet source is an OCI Helm chart instead of a Git repo.
+
+Unlike scenario 2 (one ApplicationSet per service), here a single Helm chart packages the entire application and a single ApplicationSet per placement distributes it — suited for cohesive applications released as a unit.
+
+The Quay OCI repo must be registered in Argo CD as a Helm repository. See the [bookinfo chart repo](https://github.com/too-common-name/gitops-experiments-bookinfo) for build/push instructions.
+
+Pairs well with scenario 4 to also install the Service Mesh operator on target clusters via ACM policies.
+
+```bash
+oc apply -f bootstrap/5-acm-helm-quay.yaml
+```
+
 ## Tenants
 
 The `tenants/` folder contains Kustomize overlays that set up namespaces, quotas, limits, network policies and role bindings for each environment. These are consumed by the tenant ApplicationSets in scenarios 1 and 2.
@@ -78,3 +94,4 @@ The `tenants/` folder contains Kustomize overlays that set up namespaces, quotas
 
 - [gitops-experiments-orders](https://github.com/too-common-name/gitops-experiments-orders) — Orders microservice (Helm)
 - [gitops-experiments-invoices](https://github.com/too-common-name/gitops-experiments-invoices) — Invoices microservice (Kustomize)
+- [gitops-experiments-bookinfo](https://github.com/too-common-name/gitops-experiments-bookinfo) — Istio Bookinfo (Helm, OCI/Quay)

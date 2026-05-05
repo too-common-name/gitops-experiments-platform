@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: bookinfo-project
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: "Project for the Bookinfo application deployed from Quay OCI"
+
+  sourceRepos:
+    - 'quay.io/rh-ee-drossi'
+
+  destinations:
+    - namespace: 'bookinfo'
+      server: '*'
+
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
