@@ -25,25 +25,18 @@ spec:
         helm:
           valuesObject:
             productpage:
-              replicas: 2
-              resources:
-                requests:
-                  cpu: 100m
-                  memory: 128Mi
-                limits:
-                  cpu: 500m
-                  memory: 256Mi
+              replicas: 1
             details:
-              replicas: 2
+              replicas: 1
             reviews:
               v1:
-                replicas: 2
+                replicas: 1
               v2:
-                replicas: 2
+                replicas: 1
               v3:
-                replicas: 2
+                replicas: 1
             ratings:
-              replicas: 2
+              replicas: 1
       destination:
         server: '{{server}}'
         namespace: bookinfo
