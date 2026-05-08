@@ -22,8 +22,8 @@ spec:
     spec:
       project: bookinfo-project
       source:
-        repoURL: 'quay.io/rh-ee-drossi'
-        chart: bookinfo
+        repoURL: 'oci://quay.io/rh-ee-drossi/bookinfo'
+        path: .
         targetRevision: '0.1.0'
         helm:
           valuesObject:

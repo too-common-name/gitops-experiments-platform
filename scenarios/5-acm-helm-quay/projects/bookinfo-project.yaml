@@ -11,7 +11,7 @@ spec:
   description: "Project for the Bookinfo application deployed from Quay OCI"
 
   sourceRepos:
-    - 'quay.io/rh-ee-drossi'
+    - 'oci://quay.io/rh-ee-drossi/bookinfo'
 
   destinations:
     - namespace: 'bookinfo'
