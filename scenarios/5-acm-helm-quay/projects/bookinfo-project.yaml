@@ -18,12 +18,8 @@ spec:
       server: '*'
 
   namespaceResourceWhitelist:
-    - group: 'gateway.networking.k8s.io'
-      kind: Gateway
-    - group: 'gateway.networking.k8s.io'
-      kind: HTTPRoute
-    - group: 'route.openshift.io'
-      kind: Route
+    - group: '*'
+      kind: '*'
 
   clusterResourceWhitelist:
     - group: ''
