@@ -11,7 +11,13 @@ spec:
     repoURL: 'https://github.com/too-common-name/gitops-experiments-platform.git'
     targetRevision: HEAD
     path: scenarios/4-acm-operator-policies
-    helm: {}
+    helm:
+      valuesObject:
+        pipelines:
+          channel: "latest"
+        servicemesh:
+          channel: "stable"
+          version: "v1.28-latest"
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: acm-policies
