@@ -64,7 +64,7 @@ spec:
                   namespace: istio-system
                 spec:
                   namespace: istio-system
-                  version: {{ .Values.servicemesh.version | default "v1.24" }}
+                  version: {{ .Values.servicemesh.version | default "v1.28-latest" }}
                   updateStrategy:
                     type: InPlace
     # ------------------------------------------------------------------
@@ -103,4 +103,4 @@ spec:
                   namespace: istio-cni
                 spec:
                   namespace: istio-cni
-                  version: {{ .Values.servicemesh.version | default "v1.24" }}
+                  version: {{ .Values.servicemesh.version | default "v1.28-latest" }}

@@ -3,4 +3,4 @@ pipelines:
 
 servicemesh:
   channel: "stable"
-  version: "v1.24"
+  version: "v1.28-latest"
