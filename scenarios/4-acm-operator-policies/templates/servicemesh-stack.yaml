@@ -1,0 +1,106 @@
+{{- $name := "servicemesh" -}}
+{{ include "acm-policies.placement-and-binding" (dict "name" $name) }}
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: policy-{{ $name }}
+  namespace: acm-policies
+spec:
+  remediationAction: enforce
+  disabled: false
+  policy-templates:
+    # ------------------------------------------------------------------
+    # Install the Sail operator (OSSM 3) via OLM
+    # ------------------------------------------------------------------
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1beta1
+        kind: OperatorPolicy
+        metadata:
+          name: sailoperator-policy
+        spec:
+          severity: medium
+          remediationAction: enforce
+          complianceType: musthave
+          upgradeApproval: Automatic
+          subscription:
+            channel: {{ .Values.servicemesh.channel | default "stable" }}
+            name: servicemeshoperator3
+            source: redhat-operators
+            sourceNamespace: openshift-marketplace
+    # ------------------------------------------------------------------
+    # Namespace istio-system + Istio control plane CR
+    # ------------------------------------------------------------------
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: istio-system-namespace
+        spec:
+          remediationAction: enforce
+          severity: medium
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: v1
+                kind: Namespace
+                metadata:
+                  name: istio-system
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: istio-controlplane
+        spec:
+          remediationAction: enforce
+          severity: medium
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: sailoperator.io/v1
+                kind: Istio
+                metadata:
+                  name: default
+                  namespace: istio-system
+                spec:
+                  namespace: istio-system
+                  version: {{ .Values.servicemesh.version | default "v1.24" }}
+                  updateStrategy:
+                    type: InPlace
+    # ------------------------------------------------------------------
+    # Namespace istio-cni + IstioCNI CR
+    # ------------------------------------------------------------------
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: istio-cni-namespace
+        spec:
+          remediationAction: enforce
+          severity: medium
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: v1
+                kind: Namespace
+                metadata:
+                  name: istio-cni
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: istio-cni-plugin
+        spec:
+          remediationAction: enforce
+          severity: medium
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: sailoperator.io/v1
+                kind: IstioCNI
+                metadata:
+                  name: default
+                  namespace: istio-cni
+                spec:
+                  namespace: istio-cni
+                  version: {{ .Values.servicemesh.version | default "v1.24" }}

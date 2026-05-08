@@ -1,0 +1,9 @@
+# Binds the "default" ManagedClusterSet to this namespace so that
+# Placements can discover and target managed clusters.
+apiVersion: cluster.open-cluster-management.io/v1beta2
+kind: ManagedClusterSetBinding
+metadata:
+  name: default
+  namespace: acm-policies
+spec:
+  clusterSet: default
