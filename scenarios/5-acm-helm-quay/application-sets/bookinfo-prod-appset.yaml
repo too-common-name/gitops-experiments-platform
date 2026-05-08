@@ -16,6 +16,9 @@ spec:
   template:
     metadata:
       name: 'bookinfo-prod-{{name}}'
+      labels:
+        app.kubernetes.io/part-of: bookinfo
+        apps.open-cluster-management.io/reconcile-rate: medium
     spec:
       project: bookinfo-project
       source:
@@ -24,6 +27,8 @@ spec:
         targetRevision: '0.1.0'
         helm:
           valuesObject:
+            gateway:
+              enabled: true
             productpage:
               replicas: 1
             details:
