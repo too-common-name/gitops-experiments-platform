@@ -11,9 +11,7 @@ spec:
     repoURL: 'https://github.com/too-common-name/gitops-experiments-platform.git'
     targetRevision: HEAD
     path: scenarios/4-acm-operator-policies
-    helm:
-      valueFiles:
-        - ../../clusters/demo-cluster/acm-policies-values.yaml
+    helm: {}
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: acm-policies

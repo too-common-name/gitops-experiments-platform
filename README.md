@@ -100,7 +100,7 @@ Installs OLM operators on managed clusters using ACM Governance Policies driven 
 - `pipelines=enabled` — installs OpenShift Pipelines
 - `servicemesh=enabled` — installs OpenShift Service Mesh 3 (Sail operator) + deploys Istio control plane (`Istio` + `IstioCNI` CRs)
 
-Per-cluster values live in `clusters/<name>/acm-policies-values.yaml`.
+Default values live in `scenarios/4-acm-operator-policies/values.yaml`.
 
 ```bash
 oc apply -f bootstrap/4-acm-operator-policies.yaml
