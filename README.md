@@ -8,10 +8,41 @@ Each scenario is self-contained under `scenarios/` and has a matching bootstrap 
 
 All scenarios require **OpenShift GitOps** (Argo CD) installed on the cluster. Scenarios 2, 4 and 5 also require **Advanced Cluster Management** on the hub.
 
-The Argo CD controller needs cluster-admin to manage ACM resources (policies, placements) across namespaces:
+The Argo CD controller needs permissions to manage ACM resources (policies, placements, clusterset bindings). Apply the least-privilege RBAC:
 
 ```bash
-oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller
+oc apply -f - <<'EOF'
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argocd-acm-policies
+rules:
+  - apiGroups: [cluster.open-cluster-management.io]
+    resources: [managedclustersetbindings]
+    verbs: [create, delete, get, list, patch, update, watch]
+  - apiGroups: [cluster.open-cluster-management.io]
+    resources: [managedclustersets/bind]
+    verbs: [create]
+  - apiGroups: [cluster.open-cluster-management.io]
+    resources: [placements, placementdecisions]
+    verbs: [create, delete, get, list, patch, update, watch]
+  - apiGroups: [policy.open-cluster-management.io]
+    resources: [policies, placementbindings]
+    verbs: [create, delete, get, list, patch, update, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argocd-acm-policies
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: argocd-acm-policies
+subjects:
+  - kind: ServiceAccount
+    name: openshift-gitops-argocd-application-controller
+    namespace: openshift-gitops
+EOF
 ```
 
 Your user needs admin access in the Argo CD UI. If using the embedded OAuth server:
@@ -64,12 +95,19 @@ oc apply -f bootstrap/3-pr-environments.yaml
 
 ### 4 — ACM operator policies
 
-Shows how to install OLM operators on managed clusters using ACM Governance Policies driven by cluster labels. This scenario is a Helm chart — label a cluster with `automation=enabled` and ACM takes care of installing Pipelines and AAP.
+Installs OLM operators on managed clusters using ACM Governance Policies driven by fine-grained cluster labels. Each operator has its own label-based Placement, so you can enable them independently:
+
+- `pipelines=enabled` — installs OpenShift Pipelines
+- `servicemesh=enabled` — installs OpenShift Service Mesh 3 (Sail operator) + deploys Istio control plane (`Istio` + `IstioCNI` CRs)
 
 Per-cluster values live in `clusters/<name>/acm-policies-values.yaml`.
 
 ```bash
 oc apply -f bootstrap/4-acm-operator-policies.yaml
+
+# Then label managed clusters to trigger installation:
+oc label managedcluster <cluster-name> servicemesh=enabled
+oc label managedcluster <cluster-name> pipelines=enabled
 ```
 
 ### 5 — ACM + Helm from Quay (OCI)
